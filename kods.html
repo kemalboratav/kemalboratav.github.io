@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medya Takip Listesi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #333;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        #add-section {
+            margin-bottom: 10px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #ff6f61;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ff867f;
+            transform: scale(1.1);
+        }
+
+        #lists, #watched-categories {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        #lists div, #watched-categories div {
+            margin: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        li:hover {
+            background-color: #f5f5f5;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🎬 Medya Takip Listesi 🎶</h1>
+    <nav>
+        <button id="main-page-button">Ana Sayfa</button>
+        <button id="watched-page-button">İzlediklerim</button>
+    </nav>
+    <div id="main-page">
+        <div id="add-section">
+            <input type="text" id="item-input" placeholder="Başlık Girin">
+            <select id="category-select">
+                <option value="film">İzlenecek Filmler</option>
+                <option value="dizi">İzlenecek Diziler</option>
+                <option value="müzik">Dinlenecek Müzikler</option>
+                <option value="kitap">Okunacak Kitaplar</option>
+                <option value="belgesel">İzlenecek Belgeseller</option>
+            </select>
+            <button id="add-button">Ekle</button>
+        </div>
+        <div id="lists">
+            <div id="film-list">
+                <h2>🎥 İzlenecek Filmler</h2>
+                <ul></ul>
+            </div>
+            <div id="dizi-list">
+                <h2>📺 İzlenecek Diziler</h2>
+                <ul></ul>
+            </div>
+            <div id="müzik-list">
+                <h2>🎵 Dinlenecek Müzikler</h2>
+                <ul></ul>
+            </div>
+            <div id="kitap-list">
+                <h2>📚 Okunacak Kitaplar</h2>
+                <ul></ul>
+            </div>
+            <div id="belgesel-list">
+                <h2>🎞️ İzlenecek Belgeseller</h2>
+                <ul></ul>
+            </div>
+        </div>
+    </div>
+    <div id="watched-page" style="display: none;">
+        <h2>📅 İzlediklerim</h2>
+        <div id="watched-categories">
+            <div id="watched-film-list">
+                <h3>🎥 İzlenmiş Filmler</h3>
+                <ul></ul>
+            </div>
+            <div id="watched-dizi-list">
+                <h3>📺 İzlenmiş Diziler</h3>
+                <ul></ul>
+            </div>
+            <div id="watched-müzik-list">
+                <h3>🎵 Dinlenmiş Müzikler</h3>
+                <ul></ul>
+            </div>
+            <div id="watched-kitap-list">
+                <h3>📚 Okunmuş Kitaplar</h3>
+                <ul></ul>
+            </div>
+            <div id="watched-belgesel-list">
+                <h3>🎞️ İzlenmiş Belgeseller</h3>
+                <ul></ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        const addButton = document.getElementById("add-button");
+        const itemInput = document.getElementById("item-input");
+        const categorySelect = document.getElementById("category-select");
+
+        const mainPage = document.getElementById("main-page");
+        const watchedPage = document.getElementById("watched-page");
+        const mainPageButton = document.getElementById("main-page-button");
+        const watchedPageButton = document.getElementById("watched-page-button");
+
+        const lists = {
+            film: document.querySelector("#film-list ul"),
+            dizi: document.querySelector("#dizi-list ul"),
+            müzik: document.querySelector("#müzik-list ul"),
+            kitap: document.querySelector("#kitap-list ul"),
+            belgesel: document.querySelector("#belgesel-list ul"),
+        };
+
+        const watchedLists = {
+            film: document.querySelector("#watched-film-list ul"),
+            dizi: document.querySelector("#watched-dizi-list ul"),
+            müzik: document.querySelector("#watched-müzik-list ul"),
+            kitap: document.querySelector("#watched-kitap-list ul"),
+            belgesel: document.querySelector("#watched-belgesel-list ul"),
+        };
+
+        function addItem(category, text) {
+            const list = lists[category];
+            const li = document.createElement("li");
+
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Sil";
+            deleteButton.style.marginLeft = "10px";
+            deleteButton.addEventListener("click", () => {
+                list.removeChild(li);
+                saveData();
+            });
+
+            const moveButton = document.createElement("button");
+            moveButton.textContent = "Taşı";
+            moveButton.style.marginLeft = "10px";
+            moveButton.addEventListener("click", () => {
+                moveToWatched(text, category);
+                list.removeChild(li);
+                saveData();
+            });
+
+            li.appendChild(document.createTextNode(text));
+            li.appendChild(deleteButton);
+            li.appendChild(moveButton);
+            list.appendChild(li);
+
+            saveData();
+        }
+
+        function moveToWatched(text, category) {
+            const watchedList = watchedLists[category];
+            const li = document.createElement("li");
+
+            const dateInput = document.createElement("input");
+            dateInput.type = "date";
+            dateInput.valueAsDate = new Date();
+            dateInput.style.marginLeft = "10px";
+
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Sil";
+            deleteButton.style.marginLeft = "10px";
+            deleteButton.addEventListener("click", () => {
+                watchedList.removeChild(li);
+                saveData();
+            });
+
+            li.textContent = text;
+            li.appendChild(dateInput);
+            li.appendChild(deleteButton);
+            watchedList.appendChild(li);
+
+            saveData();
+        }
+
+        function saveData() {
+            const data = {
+                film: getListItems(lists.film),
+                dizi: getListItems(lists.dizi),
+                müzik: getListItems(lists.müzik),
+                kitap: getListItems(lists.kitap),
+                belgesel: getListItems(lists.belgesel),
+                watchedFilm: getListItems(watchedLists.film),
+                watchedDizi: getListItems(watchedLists.dizi),
+                watchedMüzik: getListItems(watchedLists.müzik),
+                watchedKitap: getListItems(watchedLists.kitap),
+                watchedBelgesel: getListItems(watchedLists.belgesel),
+            };
+            localStorage.setItem("mediaList", JSON.stringify(data));
+        }
+
+        function getListItems(list) {
+            const items = [];
+            list.querySelectorAll("li").forEach(li => {
+                const text = li.textContent.replace("Sil", "").replace("Taşı", "").trim();
+                items.push(text);
+            });
+            return items;
+        }
+
+        function loadData() {
+            const data = JSON.parse(localStorage.getItem("mediaList"));
+            if (data) {
+                loadListItems(lists.film, data.film);
+                loadListItems(lists.dizi, data.dizi);
+                loadListItems(lists.müzik, data.müzik);
+                loadListItems(lists.kitap, data.kitap);
+                loadListItems(lists.belgesel, data.belgesel);
+                loadListItems(watchedLists.film, data.watchedFilm);
+                loadListItems(watchedLists.dizi, data.watchedDizi);
+                loadListItems(watchedLists.müzik, data.watchedMüzik);
+                loadListItems(watchedLists.kitap, data.watchedKitap);
+                loadListItems(watchedLists.belgesel, data.watchedBelgesel);
+            }
+        }
+
+        function loadListItems(list, items) {
+            items.forEach(text => {
+                const li = document.createElement("li");
+
+                if (list === watchedLists.film || list === watchedLists.dizi || list === watchedLists.müzik || list === watchedLists.kitap || list === watchedLists.belgesel) {
+                    const dateInput = document.createElement("input");
+                    dateInput.type = "date";
+                    dateInput.valueAsDate = new Date();
+                    dateInput.style.marginLeft = "10px";
+
+                    const deleteButton = document.createElement("button");
+                    deleteButton.textContent = "Sil";
+                    deleteButton.style.marginLeft = "10px";
+                    deleteButton.addEventListener("click", () => {
+                        list.removeChild(li);
+                        saveData();
+                    });
+
+                    li.textContent = text;
+                    li.appendChild(dateInput);
+                    li.appendChild(deleteButton);
+                } else {
+                    const deleteButton = document.createElement("button");
+                    deleteButton.textContent = "Sil";
+                    deleteButton.style.marginLeft = "10px";
+                    deleteButton.addEventListener("click", () => {
+                        list.removeChild(li);
+                        saveData();
+                    });
+
+                    const moveButton = document.createElement("button");
+                    moveButton.textContent = "Taşı";
+                    moveButton.style.marginLeft = "10px";
+                    moveButton.addEventListener("click", () => {
+                        moveToWatched(text, getCategoryFromList(list));
+                        list.removeChild(li);
+                        saveData();
+                    });
+
+                    li.textContent = text;
+                    li.appendChild(deleteButton);
+                    li.appendChild(moveButton);
+                }
+
+                list.appendChild(li);
+            });
+        }
+
+        function getCategoryFromList(list) {
+            if (list === lists.film) return "film";
+            if (list === lists.dizi) return "dizi";
+            if (list === lists.müzik) return "müzik";
+            if (list === lists.kitap) return "kitap";
+            if (list === lists.belgesel) return "belgesel";
+            return "";
+        }
+
+        addButton.addEventListener("click", () => {
+            const text = itemInput.value.trim();
+            const category = categorySelect.value;
+
+            if (text) {
+                addItem(category, text);
+                itemInput.value = "";
+            } else {
+                alert("Lütfen bir başlık girin!");
+            }
+        });
+
+        mainPageButton.addEventListener("click", () => {
+            mainPage.style.display = "block";
+            watchedPage.style.display = "none";
+        });
+
+        watchedPageButton.addEventListener("click", () => {
+            mainPage.style.display = "none";
+            watchedPage.style.display = "block";
+        });
+
+        // Sayfa yüklendiğinde verileri yükle
+        window.addEventListener("load", loadData);
+    </script>
+</body>
+</html>
